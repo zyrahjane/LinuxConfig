@@ -2,56 +2,67 @@
 
 ## AWS info
 
-IP address: 54.252.251.201.
+IP address(publicIP): 54.206.123.68
 
 Accessible SSH port: 2200.
 
-Application URL: ec2-54-252-251-201.ap-southeast-2.compute.amazonaws.com
+Application URL(AppURL): ec2-54-252-251-201.ap-southeast-2.compute.amazonaws.com
 
 ## Steps Taken
 
-### 1 - Create a new user named *grader* and grant this user sudo permissions.
+### 1 - Amazon Lightsail setup
 
-1. Log into the remote VM as *ubuntu* user through ssh: `$ ssh ubuntu@54.252.251.201`.
+1. Networking tab in Firewall section 'Add Another' 1 for custom TCP with port number 2200 and UDP 123.
+2. Save setting
+3. In account details, SSH keys download .pem file
+
+### 2 - Create a new user named *grader* and grant this user sudo permissions.
+
+1. Log into the remote VM as *ubuntu* user through ssh: `$ ssh ubuntu@54.206.123.68 -p 22 -i LightsailDefaultPrivateKey-ap-southeast-2.pem`. (make sure that the pem file is in directory)
 2. Add a new user called *grader*: `$ sudo adduser grader`.
 3. Create a new file under the suoders directory: `$ sudo nano /etc/sudoers.d/grader`. Fill that newly created file with the following line of text: "grader ALL=(ALL:ALL) ALL", then save it.
 
 
-### 2 - Update all currently installed packages
+### 3 - Update all currently installed packages
 
 1. `$ sudo apt-get update`.
 2. `$ sudo apt-get upgrade`.
-3. Install *finger*.
+3. Install *finger*. `sudo apt-get install finger`
 
-### 3 - Configure the local timezone to UTC
+### 4 - Configure the local timezone to UTC
 
 1. Open time configuration dialog and set it to UTC with: `$ sudo dpkg-reconfigure tzdata`.
 2. Install *ntp daemon ntpd* for a better synchronization of the server's time over the network connection: `$ sudo apt-get install ntp`.
+3. Check with:`$ date`
 
 Source: [UbuntuTime](https://help.ubuntu.com/community/UbuntuTime).
 
-### 4 - Configure the key-based authentication for *grader* user
+### 5 - Configure the key-based authentication for *grader* user
 
-1. Generate an encryption key **on your local machine** with: `$ ssh-keygen -f ~/.ssh/udacity_key.rsa`.
-2. Log into the remote VM as *root* user through ssh and create the following file: `$ touch /home/grader/.ssh/authorized_keys`.
+1. Generate an encryption key **on your local machine** with: `$ ssh-keygen -f ~/.ssh/udacity_key`.
+2. Log into the remote VM as *root* user through ssh and create the following folder if not exists and file: `$ sudo mkdir /home/grader/.ssh`
+`$ sudo nano /home/grader/.ssh/authorized_keys`.
 3. Copy the content of the *udacity_key.pub* file from your local machine to the */home/grader/.ssh/authorized_keys* file you just created on the remote VM. Then change some permissions:
     1. `$ sudo chmod 700 /home/grader/.ssh`.
     2. `$ sudo chmod 644 /home/grader/.ssh/authorized_keys`.
     3. Finally change the owner from *root* to *grader*: `$ sudo chown -R grader:grader /home/grader/.ssh`.
-4. Now you are able to log into the remote VM through ssh with the following command: `$ ssh -i ~/.ssh/udacity_key.rsa grader@54.252.251.201`.
+4. Now you are able to log into the remote VM through ssh with the following command: `$ ssh -i ~/.ssh/udacity_key.rsa grader@54.206.123.68`.
 
-### 5 - Enforce key-based authentication
-1. `$ sudo nano /etc/ssh/sshd_config`. Find the *PasswordAuthentication* line and edit it to *no*.
-2. `$ sudo service ssh restart`.
+### 6 - ssh_config changes
+1. `$ sudo nano /etc/ssh/sshd_config`.
+2. Find the *PasswordAuthentication* line and edit it to *no*.
+3. Find the *PermitRootLogin* line and edit it to *no*.
+4. `$ sudo service ssh restart`.
 
-### 6 - Change the SSH port from 22 to 2200
-1. `$ sudo nano /etc/ssh/sshd_config`. Find the *Port* line and edit it to *2200*.
-2. `$ sudo service ssh restart`.
-3. Now you are able to log into the remote VM through ssh with the following command: `$ ssh -i ~/.ssh/udacity_key.rsa -p 2200 grader@54.252.251.201`.
+### 7 - Change the SSH port from 22 to 2200
+1. `$ sudo nano /etc/ssh/sshd_config`.
+2. Find the *Port* line and edit it to *2200*.
+3. `$ sudo service ssh restart`.
+4. Now you are able to log into the remote VM through ssh with the following command: `$ ssh -i ~/.ssh/udacity_key -p 2200 grader@54.206.123.68`.
 
 Source: [Ubuntu forums](http://ubuntuforums.org/showthread.php?t=1739013).
 
-### 7 - Configure the Uncomplicated Firewall (UFW)
+### 8 - Configure the Uncomplicated Firewall (UFW)
 
 Project requirements need the server to only allow incoming connections for SSH (port 2200), HTTP (port 80), and NTP (port 123).
 
@@ -59,14 +70,14 @@ Project requirements need the server to only allow incoming connections for SSH 
 2. `$ sudo ufw allow 80/tcp`.
 3. `$ sudo ufw allow 123/udp`.
 4. `$ sudo ufw enable`.
-5. In the Networking tab in the Amazon account add custom udp - port range: 123 and custom tcp - 2200
+5. check: `$ sudo ufw status`
 
 ### 9 - Configure firewall to monitor for repeated unsuccessful login attempts and ban attackers
 
 Install *fail2ban* in order to mitigate brute force attacks by users and bots alike.
-
+s
 1. `$ sudo apt-get update`.
-2. `$ sudo apt-get install fail2ban`.
+2. `$ sudo apt-get install fail2ban`.ß
 3. We need the *sendmail* package to send the alerts to the admin user: `$ sudo apt-get install sendmail`.
 4. Create a file to safely customize the *fail2ban* functionality: `$ sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local` .
 5. Open the *jail.local* and edit it: `$ sudo nano /etc/fail2ban/jail.local`. Set the *destemail* field to admin user's email address.
@@ -93,48 +104,58 @@ Sources: [DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-
 2. Configure your username: `$ git config --global user.name <username>`.
 3. Configure your email: `$ git config --global user.email <email>`.
 
-### 13 - Clone the Catalog app from Github
+### 13 - Setup for deploying a Flask Application on Ubuntu VPS
+Source: [DigitalOcean][20]
 
-1. `$ cd /var/www`. Then: `$ sudo mkdir catalog`.
-2. Change owner for the *catalog* folder: `$ sudo chown -R grader:grader catalog`.
-3. Move inside that newly created folder: `$ cd /catalog` and clone the catalog repository from Github: `$ git clone https://github.com/iliketomatoes/catalog.git catalog`.
-4. Make a *catalog.wsgi* file to serve the application over the *mod_wsgi*. That file should look like this:
+1. Extend Python with additional packages that enable Apache to serve Flask applications:
+  `$ sudo apt-get install libapache2-mod-wsgi python-dev`
+2. Enable mod_wsgi (if not already enabled):
+  `$ sudo a2enmod wsgi`
+3. `$ cd /var/www`. Then: `$ sudo mkdir catalog`.
+4. Change owner for the *catalog* folder: `$ sudo chown -R grader:grader catalog`.
 
+
+### 14 - Create Flask app
+
+1. Create the file that will contain the flask application logic:
+  `$ sudo nano __init__.py`
+2. Paste in the following code:
 ```python
-import sys
-import logging
-logging.basicConfig(stream=sys.stderr)
-sys.path.insert(0, "/var/www/catalog/")
-
-from catalog import app as application
+from flask import Flask
+    app = Flask(__name__)
+    @app.route("/")
+    def hello():
+        return "Veni vidi vici!!"
+    if __name__ == "__main__":
+        app.run()
 ```
-5. Some tweaks were needed to deploay the catalog app, so I made a *deployment* branch which slightly differs from the *master*. Move inside the repository, `$ cd /var/www/catalog/catalog` and change branch with: `$ git checkout deployment`.
+### 15 - Install Flask
+1. Install pip installer:
+`$ sudo apt-get install python-pip`
+2. Install virtualenv:
+`$ sudo pip install virtualenv`
+3. Set virtual environment to name 'venv':
+`$ sudo virtualenv venv`
+4. Enable all permissions for the new virtual environment (no sudo should be used within):
+Source: [Stackoverflow][21]
+`$ sudo chmod -R 777 venv`
+5. Activate the virtual environment:
+`$ source venv/bin/activate`
+6. Install Flask inside the virtual environment:
+`$ pip install Flask`
+7. Run the app:
+`$ python __init__.py`
+8. Deactivate the environment:
+`$ deactivate`
 
-**Notes**: the *.git* folder will be inaccessible from the web without any particular setting. The only directory that can be listed in the browser will be the static folder: [static assets](http://ec2-52-34-208-247.us-west-2.compute.amazonaws.com/static/).
-
-### 14 - Install virtual environment, Flask and the project's dependencies
-
-1. Install *pip*, the tool for installing Python packages: `$ sudo apt-get install python-pip`.
-2. If *virtualenv* is not installed, use *pip* to install it using the following command: `$ sudo pip install virtualenv`.
-3. Move to the *catalog* folder: `$ cd /var/www/catalog`. Then create a new virtual environment with the following command: `$ sudo virtualenv venv`.
-4. Activate the virtual environment: `$ source venv/bin/activate`.
-5. Change permissions to the virtual environment folder: `$ sudo chmod -R 777 venv`.
-6. Install Flask: `$ pip install Flask`.
-7. Install all the other project's dependencies: `$ pip install bleach httplib2 request oauth2client sqlalchemy python-psycopg2`.
-
-Sources: [DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-deploy-a-flask-application-on-an-ubuntu-vps), [Dabapps](http://www.dabapps.com/blog/introduction-to-pip-and-virtualenv-python/).
-
-### 15 - Configure and enable a new virtual host
-
-1. Create a virtual host conifg file: `$ sudo nano /etc/apache2/sites-available/catalog.conf`.
-2. Paste in the following lines of code:
+### 16 - Configure and Enable a New Virtual Host#
+1. Create a virtual host config file
+`$ sudo nano /etc/apache2/sites-available/catalog.conf`
+2. Paste in the following lines of code and change names and addresses regarding your application:
 ```
 <VirtualHost *:80>
-    ServerName 52.34.208.247
-    ServerAlias ec2-52-34-208-247.us-west-2.compute.amazonaws.com
-    ServerAdmin admin@52.34.208.247
-    WSGIDaemonProcess catalog python-path=/var/www/catalog:/var/www/catalog/venv/lib/python2.7/site-packages
-    WSGIProcessGroup catalog
+    ServerName 54.206.123.68
+    ServerAdmin admin@54.206.123.68
     WSGIScriptAlias / /var/www/catalog/catalog.wsgi
     <Directory /var/www/catalog/catalog/>
         Order allow,deny
@@ -150,19 +171,119 @@ Sources: [DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-
     CustomLog ${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>
 ```
-* The **WSGIDaemonProcess** line specifies what Python to use and can save you from a big headache. In this case we are explicitly saying to use the virtual environment and its packages to run the application.
 
-3. Enable the new virtual host: `$ sudo a2ensite catalog`.
+### 17 - Create the .wsgi File and Restart Apache
+1. Create wsgi file:
+`$ cd /var/www/catalog` and `$ sudo nano catalog.wsgi`
+2. Paste in the following lines of code:
+```
+#!/usr/bin/python
+import sys
+import logging
+logging.basicConfig(stream=sys.stderr)
+sys.path.insert(0,"/var/www/catalog/")
+
+from catalog import app as application
+application.secret_key = 'Add your secret key'
+```
+3. Restart Apache:
+`$ sudo service apache2 restart`
+
+
+### 18 - Clone the Catalog app from Github
+
+1. Clone the catalog repository from Github:
+`$ cd /var/www/catalog`
+`$ git clone https://github.com/zyrahjane/FEND-Catalog.git`.
+2. Move inside that newly created folder:
+`$ mv -v /var/www/catalog/FEND-Catalog/* /var/www/catalog/catalog`
+3. Remove git folder:
+`$rm -rf FEND-Catalog/`
+
+### 19 (To Do) - Make the GitHub repository inaccessible:
+  Source: [Stackoverflow][22]
+  1. Create and open .htaccess file:
+    `$ cd /var/www/catalog/` and `$ sudo vim .htaccess`
+  2. Paste in the following:
+    `RedirectMatch 404 /\.git`
+
+
+### 20 - Install need packages and enable virtual host
+
+1. Install all the other project's dependencies: `$ pip install bleach httplib2 request oauth2client sqlalchemy psycopg2`.
+
+Sources: [DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-deploy-a-flask-application-on-an-ubuntu-vps), [Dabapps](http://www.dabapps.com/blog/introduction-to-pip-and-virtualenv-python/).
+
+
+2. Enable the new virtual host:
+`$ sudo a2ensite catalog`.
 
 Source: [DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-run-django-with-mod_wsgi-and-apache-with-a-virtualenv-python-environment-on-a-debian-vps).
 
-### 18 - Update OAuth authorized JavaScript origins
+### 21 - Install and configure PostgreSQL
+
+1. Install some necessary Python packages for working with PostgreSQL:
+`$ sudo apt-get install libpq-dev python-dev`.
+2. Install PostgreSQL:
+`$ sudo apt-get install postgresql postgresql-contrib`.
+3. Postgres is automatically creating a new user during its installation, whose name is 'postgres'. That is a tusted user who can access the database software. So let's change the user with:
+`$ sudo su - postgres`,
+then connect to the database system with:
+ `$ psql`.
+4. Create a new user called 'catalog' with his password:
+`# CREATE USER catalog WITH PASSWORD 'password';`.
+5. Give *catalog* user the CREATEDB capability:
+`# ALTER USER catalog CREATEDB;`.
+6. Create the 'catalog' database owned by *catalog* user:
+`# CREATE DATABASE catalog WITH OWNER catalog;`.
+7. Connect to the database: `# \c catalog`.
+8. Revoke all rights:
+`# REVOKE ALL ON SCHEMA public FROM public;`.
+9. Lock down the permissions to only let *catalog* role create tables: `# GRANT ALL ON SCHEMA public TO catalog;`.
+10. check:
+`# \du`
+11. Exit:
+`# q`, then
+`$ exit`
+
+### 22 - Set up database
+1. In python files change create_engine functions to read:
+`engine = create_engine('postgresql://catalog:password@localhost/catalog')`
+They can be found:
+`nano lotsofcocktails.py`
+`nano application.py`
+2. Rename application.py:
+  `$ mv application.py __init__.py`
+3. run:
+`python /var/www/catalog/catalog/database_setup_zb.py`, then
+`python /var/www/catalog/catalog/lotsofcocktails.py`
+4. check in sql
+5. To prevent potential attacks from the outer world we double check that no remote connections to the database are allowed. Open the following file:
+`$ sudo nano /etc/postgresql/9.5/main/pg_hba.conf` and edit it, if necessary, to make it look like this:
+```
+local   all             postgres                                peer
+local   all             all                                     peer
+host    all             all             127.0.0.1/32            md5
+host    all             all             ::1/128                 md5
+```
+Source: [DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-secure-postgresql-on-an-ubuntu-vps).
+
+### 23 - Install system monitor tools
+
+1. `$ sudo apt-get update`.
+2. `$ sudo apt-get install glances`.
+3. To start this system monitor program just type this from the command line: `$ glances`.
+4. Type `$ glances -h` to know more about this program's options.
+
+Source: [eHowStuff](http://www.ehowstuff.com/how-to-install-and-use-glances-system-monitor-in-ubuntu/).
+
+### 24 (To Do) - Update OAuth authorized JavaScript origins
 
 1. To let users correctly log-in change the authorized URI to [http://ec2-52-34-208-247.us-west-2.compute.amazonaws.com/](http://ec2-52-34-208-247.us-west-2.compute.amazonaws.com/) on both Google and Facebook developer dashboards.
 
-### 19 - Restart Apache to launch the app
+### 25 - Restart Apache to launch the app
 1. `$ sudo service apache2 restart`.
+2. check in browser - http://54.206.123.68/
 
-SOURCE: https://github.com/iliketomatoes/linux_server_configuration
-
+#### Special thanks to [*stueken*](https://github.com/stueken) who wrote a really helpful README in his [repository](https://github.com/stueken/FSND-P5_Linux-Server-Configuration).
 
