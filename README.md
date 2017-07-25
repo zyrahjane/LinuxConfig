@@ -122,12 +122,12 @@ Source: [DigitalOcean][20]
 2. Paste in the following code:
 ```python
 from flask import Flask
-    app = Flask(__name__)
-    @app.route("/")
-    def hello():
-        return "Veni vidi vici!!"
-    if __name__ == "__main__":
-        app.run()
+app = Flask(__name__)
+@app.route("/")
+def hello():
+    return "Veni vidi vici!!"
+if __name__ == "__main__":
+    app.run()
 ```
 ### 15 - Install Flask
 1. Install pip installer:
@@ -176,19 +176,21 @@ Source: [Stackoverflow][21]
 1. Create wsgi file:
 `$ cd /var/www/catalog` and `$ sudo nano catalog.wsgi`
 2. Paste in the following lines of code:
-```
+
 #!/usr/bin/python
 import sys
 import logging
 logging.basicConfig(stream=sys.stderr)
 sys.path.insert(0,"/var/www/catalog/")
-
+activate_this = '/var/www/catalog/venv/bin/activate_this.py'
+execfile(activate_this, dict(__file__=activate_this))
 from catalog import app as application
 application.secret_key = 'Add your secret key'
 ```
 3. Restart Apache:
 `$ sudo service apache2 restart`
 
+Sources: [Flask](http://flask.pocoo.org/docs/0.10/deploying/mod_wsgi/#working-with-virtual-environments)
 
 ### 18 - Clone the Catalog app from Github
 
@@ -200,17 +202,18 @@ application.secret_key = 'Add your secret key'
 3. Remove git folder:
 `$rm -rf FEND-Catalog/`
 
-### 19 (To Do) - Make the GitHub repository inaccessible:
-  Source: [Stackoverflow][22]
+### 19 - Make the GitHub repository inaccessible:
   1. Create and open .htaccess file:
-    `$ cd /var/www/catalog/` and `$ sudo vim .htaccess`
+    `$ cd /var/www/catalog/` and `$ sudo nano .htaccess`
   2. Paste in the following:
     `RedirectMatch 404 /\.git`
 
 
 ### 20 - Install need packages and enable virtual host
 
-1. Install all the other project's dependencies: `$ pip install bleach httplib2 request oauth2client sqlalchemy psycopg2`.
+1. Install all the other project's dependencies in the venv:
+'$ source /var/www/catalog/venv/bin/activate'
+ `$ pip install bleach httplib2 requests oauth2client sqlalchemy psycopg2`.
 
 Sources: [DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-deploy-a-flask-application-on-an-ubuntu-vps), [Dabapps](http://www.dabapps.com/blog/introduction-to-pip-and-virtualenv-python/).
 
@@ -247,14 +250,12 @@ then connect to the database system with:
 `$ exit`
 
 ### 22 - Set up database
-1. In python files change create_engine functions to read:
+1. There are a few changes in the python files, using `nano` for lotsofcocktail.py and application.py update to this line:
 `engine = create_engine('postgresql://catalog:password@localhost/catalog')`
-They can be found:
-`nano lotsofcocktails.py`
-`nano application.py`
-2. Rename application.py:
+2. Update json file paths in application.py by replacing `'XXXX.json'` with `r'/var/www/catalog/catalog/XXXX.json'`
+3. Rename application.py:
   `$ mv application.py __init__.py`
-3. run:
+4. run:
 `python /var/www/catalog/catalog/database_setup_zb.py`, then
 `python /var/www/catalog/catalog/lotsofcocktails.py`
 4. check in sql
@@ -277,13 +278,13 @@ Source: [DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-s
 
 Source: [eHowStuff](http://www.ehowstuff.com/how-to-install-and-use-glances-system-monitor-in-ubuntu/).
 
-### 24 (To Do) - Update OAuth authorized JavaScript origins
+### 24 Update OAuth authorized JavaScript origins
 
-1. To let users correctly log-in change the authorized URI to [http://ec2-52-34-208-247.us-west-2.compute.amazonaws.com/](http://ec2-52-34-208-247.us-west-2.compute.amazonaws.com/) on both Google and Facebook developer dashboards.
+1. To let users correctly log-in change the authorized URI to (http://54.206.123.68) on both Google (https://console.developers.google.com) and Facebook developer dashboards (https://developers.facebook.com/apps/).
 
 ### 25 - Restart Apache to launch the app
 1. `$ sudo service apache2 restart`.
-2. check in browser - http://54.206.123.68/
+2. check in browser - http://54.206.123.68
 
 #### Special thanks to [*stueken*](https://github.com/stueken) who wrote a really helpful README in his [repository](https://github.com/stueken/FSND-P5_Linux-Server-Configuration).
 
