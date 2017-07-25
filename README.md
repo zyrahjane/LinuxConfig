@@ -282,6 +282,8 @@ Source: [eHowStuff](http://www.ehowstuff.com/how-to-install-and-use-glances-syst
 ### 24 Update OAuth authorized JavaScript origins
 
 1. To let users correctly log-in change the authorized URI to (http://54.206.123.68) on both Google (https://console.developers.google.com) and Facebook developer dashboards (https://developers.facebook.com/apps/).
+2. Update `sudo nano /var/www/catalog/catalog/client_secrets.json`
+making sure that the public IP address is in javascript_origins `"javascript_origins":["http://localhost:5000", "http://54.206.123.68"]`
 
 ### 25 - Restart Apache to launch the app
 1. `$ sudo service apache2 restart`.
