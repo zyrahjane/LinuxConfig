@@ -52,6 +52,7 @@ Source: [UbuntuTime](https://help.ubuntu.com/community/UbuntuTime).
 1. `$ sudo nano /etc/ssh/sshd_config`.
 2. Find the *PasswordAuthentication* line and edit it to *no*.
 3. Find the *PermitRootLogin* line and edit it to *no*.
+4. At end of the file add `AllowUsers grader` and save
 4. `$ sudo service ssh restart`.
 
 ### 7 - Change the SSH port from 22 to 2200
