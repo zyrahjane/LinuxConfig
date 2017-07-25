@@ -46,7 +46,7 @@ Source: [UbuntuTime](https://help.ubuntu.com/community/UbuntuTime).
     1. `$ sudo chmod 700 /home/grader/.ssh`.
     2. `$ sudo chmod 644 /home/grader/.ssh/authorized_keys`.
     3. Finally change the owner from *root* to *grader*: `$ sudo chown -R grader:grader /home/grader/.ssh`.
-4. Now you are able to log into the remote VM through ssh with the following command: `$ ssh -i ~/.ssh/udacity_key.rsa grader@54.206.123.68`.
+4. Now you are able to log into the remote VM through ssh with the following command: `$ ssh -i ~/.ssh/udacity_key grader@54.206.123.68`.
 
 ### 6 - ssh_config changes
 1. `$ sudo nano /etc/ssh/sshd_config`.
