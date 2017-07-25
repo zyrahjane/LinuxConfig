@@ -213,7 +213,7 @@ Sources: [Flask](http://flask.pocoo.org/docs/0.10/deploying/mod_wsgi/#working-wi
 ### 20 - Install need packages and enable virtual host
 
 1. Install all the other project's dependencies in the venv:
-'$ source /var/www/catalog/venv/bin/activate'
+ `$ source /var/www/catalog/venv/bin/activate`
  `$ pip install bleach httplib2 requests oauth2client sqlalchemy psycopg2`.
 
 Sources: [DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-deploy-a-flask-application-on-an-ubuntu-vps), [Dabapps](http://www.dabapps.com/blog/introduction-to-pip-and-virtualenv-python/).
@@ -287,5 +287,5 @@ Source: [eHowStuff](http://www.ehowstuff.com/how-to-install-and-use-glances-syst
 1. `$ sudo service apache2 restart`.
 2. check in browser - http://54.206.123.68
 
-#### Special thanks to [*stueken*](https://github.com/stueken) who wrote a really helpful README in his [repository](https://github.com/stueken/FSND-P5_Linux-Server-Configuration).
+#### Special thanks to [*stueken*](https://github.com/stueken) and [*iliketomatoes*](https://github.com/iliketomatoes) their README files were super helpful
 
