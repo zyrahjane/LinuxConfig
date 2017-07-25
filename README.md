@@ -280,13 +280,24 @@ Source: [DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-s
 
 Source: [eHowStuff](http://www.ehowstuff.com/how-to-install-and-use-glances-system-monitor-in-ubuntu/).
 
-### 24 Update OAuth authorized JavaScript origins
+### 24 - Automate security updates
+
+1. `$ sudo apt-get update`.
+2. `$ sudo apt-get install glances`.
+3. To start this system monitor program just type this from the command line: `$ glances`.
+4. Type `$ glances -h` to know more about this program's options.
+
+Source: [ubuntu](https://help.ubuntu.com/community/AutomaticSecurityUpdates).
+1. `sudo apt-get install unattended-upgrades`
+2. `sudo dpkg-reconfigure --priority=low unattended-upgrades`
+
+### 25 Update OAuth authorized JavaScript origins
 
 1. To let users correctly log-in change the authorized URI to (http://54.206.123.68) on both Google (https://console.developers.google.com) and Facebook developer dashboards (https://developers.facebook.com/apps/).
 2. Update `sudo nano /var/www/catalog/catalog/client_secrets.json`
 making sure that the public IP address is in javascript_origins `"javascript_origins":["http://localhost:5000", "http://54.206.123.68"]`
 
-### 25 - Restart Apache to launch the app
+### 26 - Restart Apache to launch the app
 1. `$ sudo service apache2 restart`.
 2. check in browser - http://54.206.123.68
 
