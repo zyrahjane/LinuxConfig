@@ -177,6 +177,7 @@ Source: [Stackoverflow][21]
 `$ cd /var/www/catalog` and `$ sudo nano catalog.wsgi`
 2. Paste in the following lines of code:
 
+```
 #!/usr/bin/python
 import sys
 import logging
