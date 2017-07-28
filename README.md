@@ -1,12 +1,19 @@
 # Udacity - Linux server configuration project
 
-## AWS info
+## Objective
 
-IP address(publicIP): 54.206.123.68
+Installed and configured all required software to turn a baseline Ubuntu Amazon Web Services server into a fully functional web application server, including Apache Web Server and PostgreSQL database server.
 
-Accessible SSH port: 2200.
+## Information
 
-Application URL(AppURL): ec2-54-252-251-201.ap-southeast-2.compute.amazonaws.com
+IP address(publicIP): 54.206.123.68 **Not accessible**
+
+Accessible SSH port: 2200. **Not accessible**
+
+Application URL(AppURL): ec2-54-252-251-201.ap-southeast-2.compute.amazonaws.com **Not accessible**
+
+Project Uploaded: https://github.com/zyrahjane/Item_Catalog
+
 
 ## Steps Taken
 
@@ -198,11 +205,11 @@ Sources: [Flask](http://flask.pocoo.org/docs/0.10/deploying/mod_wsgi/#working-wi
 
 1. Clone the catalog repository from Github:
 `$ cd /var/www/catalog`
-`$ git clone https://github.com/zyrahjane/FEND-Catalog.git`.
+`$ git clone https://github.com/zyrahjane/Item_Catalog.git`.
 2. Move inside that newly created folder:
-`$ mv -v /var/www/catalog/FEND-Catalog/* /var/www/catalog/catalog`
+`$ mv -v /var/www/catalog/Item_Catalog/* /var/www/catalog/catalog`
 3. Remove git folder:
-`$rm -rf FEND-Catalog/`
+`$rm -rf Item_Catalog/`
 
 ### 19 - Make the GitHub repository inaccessible:
   1. Create and open .htaccess file:
